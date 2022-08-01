@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import FlatButton from "./components/FlatButton";
-import InputComponents from "./components/InputComponents";
-import LogoScreen from "./components/LogoScreen";
-import { StyleSheet, Text, View, StatusBar } from "react-native";
+import InputView from "./components/LoginScreen/InputView";
+import { View, StatusBar } from "react-native";
+import LogoView from "./components/LoginScreen/LogoView";
+
 
 export default function App() {
   // User Login Detail
@@ -17,57 +17,35 @@ export default function App() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "grey" }}>
-      <LogoScreen></LogoScreen>
+  
+      <View style={{ flex: 1 }}>
+        <StatusBar barStyle={"light-content"} backgroundColor={"#0d67b5"} />
 
-      <View style={styles.loginScreenContainer}>
-        <StatusBar
-          barStyle={"light-content"}
-          backgroundColor={"grey"}
-        ></StatusBar>
+        <LogoView />
 
-        <InputComponents userData={getData} propData={detail}></InputComponents>
-
-        {/*Displays Sign Up button along with Login button when user comes to login screen */}
-        {loginData[0].userID === "" ? (
-          <View style={{ alignItems: "center" }}>
-            <Text> or </Text>
-            <FlatButton
-              buttonFunction={() => {}}
-              buttonText="Sign Up"
-            ></FlatButton>
-          </View>
-        ) : (
-          // Displays UserName on screen if user inputs his data
-          <View style={styles.loginTextContainer}>
-            <Text style={styles.loginText}>
-              Logged in as : {loginData[0].userID}
-            </Text>
-          </View>
-        )}
+        <InputView userData={getData} propData={detail} />
       </View>
-    </View>
+    
   );
 }
 
-const styles = StyleSheet.create({
-  loginScreenContainer: {
-    flex: 2,
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "grey",
-  },
+// const styles = StyleSheet.create({
+//   loginScreenContainer: {
+//     width: "100%",
+//     justifyContent: "center",
+//     alignItems: "center",
+//     backgroundColor: "white",
+//   },
 
-  loginText: {
-    color: "white",
-    fontSize: 15,
-  },
+//   loginText: {
+//     color: "white",
+//     fontSize: 15,
+//   },
 
-  loginTextContainer: {
-    backgroundColor: "#e33636",
-    marginTop: 40,
-    padding: 15,
-    borderRadius: 10,
-  },
-});
+//   loginTextContainer: {
+//     backgroundColor: "#0d67b5",
+//     marginTop: 40,
+//     padding: 15,
+//     borderRadius: 10,
+//   },
+// });
