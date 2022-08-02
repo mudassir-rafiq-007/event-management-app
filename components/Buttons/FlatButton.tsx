@@ -1,8 +1,8 @@
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native"
 
 interface propType{
-    buttonText: string;
-    buttonFunction: ()=> void;
+    title: string;
+    onPressed: ()=> void;
 }
 
 export default function FlatButton (props: propType) {
@@ -11,9 +11,9 @@ export default function FlatButton (props: propType) {
         <View>
         <TouchableOpacity
           style={styles.buttonContainer}
-          onPress={props.buttonFunction}
+          onPress={props.onPressed}
         >
-          <Text style={styles.buttonText}>{props.buttonText}</Text>
+          <Text style={styles.buttonText}>{props.title}</Text>
         </TouchableOpacity>
       </View>
     )
