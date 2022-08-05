@@ -21,7 +21,7 @@ export default function HomeScreen(props: propstoHome) {
   return (
     <View style={styles.mainContainer}>
       <Text style={styles.text}>Welcome to Event Tracker</Text>
-      <Text style={styles.text}>Logged in as: {auth.currentUser?.email}</Text>
+      <Text style={styles.text2}>Logged in as: {auth.currentUser?.email}</Text>
       <FlatButton title="Log Out" onPressed={logOut}></FlatButton>
     </View>
   );
@@ -36,6 +36,10 @@ const styles = StyleSheet.create({
 
   text: {
     fontSize: 20,
+    fontWeight: "bold",
+  },
+
+  text2: {
     fontWeight: "bold",
   },
 });
