@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 
 export default function LogoView() {
   return (
@@ -11,7 +11,7 @@ export default function LogoView() {
           borderBottomLeftRadius: 20,
           borderBottomRightRadius: 20,
         }}
-        source={require("../../assets/event-tracker-logos.jpeg")}
+        source={require("../../../assets/event-tracker-logos.jpeg")}
       ></Image>
     </View>
   );

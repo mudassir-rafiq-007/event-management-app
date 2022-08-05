@@ -1,4 +1,4 @@
-import { View, StatusBar, ScrollView } from "react-native";
+import { View, StatusBar } from "react-native";
 import LogoView from "./LogoView";
 import InputView from "./InputView";
 
