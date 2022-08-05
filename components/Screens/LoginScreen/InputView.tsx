@@ -5,6 +5,8 @@ import FlatButton from "../../Buttons/FlatButton";
 import TextButton from "../../Buttons/TextButton";
 import { useState } from "react";
 
+
+// Navigation Prop type
 interface propstoInput {
   navigation: {
     navigation: {
@@ -19,26 +21,40 @@ export default function InputView(props: propstoInput) {
     password: "",
   });
 
+  // Saves the user input to the userData object
   function emailInput(value: string) {
     setUserData({ ...userData, email: value });
   }
 
+  // Saves the user input to the userData object
   function passwordInput(value: string) {
     setUserData({ ...userData, password: value });
   }
 
+  // Main Login Function
   function loginUser() {
-    if (userData.email && userData.password){
+    if (userData.email && userData.password) {
       signInWithEmailAndPassword(auth, userData.email, userData.password)
-      .then(() => {
-        props.navigation.navigation.navigate("Home");
-      })
-      .catch((error) => Alert.alert('Invalid Username/Password', 'Entered credentials don\'t match any record'));
-    }else {Alert.alert('Empty Fields', 'Fill out every field')}
-    
+        .then(() => {
+          props.navigation.navigation.navigate("Home");
+        })
+        .catch((error) =>
+          Alert.alert(
+            "Invalid Username/Password",
+            "Entered credentials don't match any record"
+          )
+        );
+        setUserData({
+          email: '',
+          password:'',
+        })
+    } else {
+      Alert.alert("Empty Fields", "Fill out every field");
+    }
   }
 
   return (
+    // Input Fields Container
     <View style={styles.viewContainer}>
       <TextInput
         style={styles.inputContainer}

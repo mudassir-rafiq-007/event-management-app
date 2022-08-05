@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { View, TextInput, StyleSheet, Alert, Text } from "react-native";
+import { Alert } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../Firebase/Firebase";
-import FlatButton from "../../Buttons/FlatButton";
-import TextButton from "../../Buttons/TextButton";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../Firebase/Firebase";
+import SignUpForm from "./SignUpForm";
 
+// Type of Navigation Prop received
 interface propsInterface {
   navigation: {
     navigate: (value: string) => void;
   };
 }
 
+// Main SignUp Function
 export default function SignUpInput(props: propsInterface) {
   const [userInput, setUserInput] = useState({
     firstName: "",
@@ -26,9 +29,7 @@ export default function SignUpInput(props: propsInterface) {
     invalidConfirmPassword: false,
   });
 
-  const specialChar = /[`!#$%^&*()_+\-=\[\]{};':"\\|,<>\/?~]/;
-  const numbers = /\d/;
-
+  // Saves the value of First Name Field to userInput object
   function onFirstNameInput(value: string) {
     setUserInput({
       ...userInput,
@@ -36,6 +37,7 @@ export default function SignUpInput(props: propsInterface) {
     });
   }
 
+  // Saves the value of Last Name Field to userInput object
   function onLastNameInput(value: string) {
     setUserInput({
       ...userInput,
@@ -43,32 +45,45 @@ export default function SignUpInput(props: propsInterface) {
     });
   }
 
+  // Saves the value of Email Field to userInput object
   function onEmailInput(value: string) {
     setUserInput({
       ...userInput,
       email: value,
     });
   }
+
+  // Saves the value of Password Field to userInput object
   function onPasswordInput(value: string) {
     setUserInput({
       ...userInput,
       password: value,
     });
   }
+
+  // Matches the confirm Password value with Password Field
+  // If password and confirm password fields data matches, then you can sign up
   function onConfirmPasswordInput(value: string) {
-    if (userInput.password != value){setUserInput({
-      ...userInput,
-      confirmPassword: value,
-      invalidConfirmPassword: true
-    });
-  } else {setUserInput({
-      ...userInput,
-      confirmPassword: value,
-      invalidConfirmPassword: false
-    });
-  }        
+    if (userInput.password != value) {
+      setUserInput({
+        ...userInput,
+        confirmPassword: value,
+        invalidConfirmPassword: true,
+      });
+    } else {
+      setUserInput({
+        ...userInput,
+        confirmPassword: value,
+        invalidConfirmPassword: false,
+      });
+    }
   }
 
+  // For Validation of Input Data
+  const specialChar = /[`!#$%^&*()_+\-=\[\]{};':"\\|,<>\/?~]/;
+  const numbers = /\d/;
+
+  // Checks the validity of user input
   function firstNameHandler() {
     setUserInput({
       ...userInput,
@@ -78,6 +93,7 @@ export default function SignUpInput(props: propsInterface) {
     });
   }
 
+  // Checks the validity of user input
   function lastNameHandler() {
     setUserInput({
       ...userInput,
@@ -87,6 +103,7 @@ export default function SignUpInput(props: propsInterface) {
     });
   }
 
+  // Checks the validity of user input
   function emailHandler() {
     setUserInput({
       ...userInput,
@@ -97,6 +114,7 @@ export default function SignUpInput(props: propsInterface) {
     });
   }
 
+  // Checks the validity of user input
   function passwordHandler() {
     setUserInput({
       ...userInput,
@@ -104,13 +122,17 @@ export default function SignUpInput(props: propsInterface) {
     });
   }
 
+  // Main function for sign up
+  // Function contains nested ifs
   function signUpHandler() {
+    // This condition checks if user has entered the data in every given field
     if (
       userInput.firstName &&
       userInput.lastName &&
       userInput.email &&
       userInput.password
     ) {
+      // This condition checks the validity of entered data
       if (
         userInput.invalidFirstName ||
         userInput.invalidLastName ||
@@ -118,16 +140,24 @@ export default function SignUpInput(props: propsInterface) {
         userInput.invalidPassword ||
         userInput.invalidConfirmPassword
       ) {
+        // If any field contains invalid input, this displays error
         Alert.alert("Invalid Input", "Data Fields contain invalid Input");
       } else {
         createUserWithEmailAndPassword(
           auth,
           userInput.email,
           userInput.password
-        ).then((userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-        }).catch((error)=> Alert.alert(error.message))
+        ).then(() => {
+            addDoc(collection(db, "users"),{
+              userFirstName: userInput.firstName,
+              userLastName: userInput.lastName,
+              userEmail: userInput.email,
+              userPassword: userInput.password
+            })
+            props.navigation.navigate('Home')
+          }).catch((error) => Alert.alert(error.message));
+          
+        // Sets the input fields back to empty
         setUserInput({
           firstName: "",
           lastName: "",
@@ -144,192 +174,20 @@ export default function SignUpInput(props: propsInterface) {
     } else Alert.alert("Error", "Some fields missing data");
   }
   return (
-    <View style={styles.viewContainer}>
-      <View style={styles.nameInputContainer}>
-        <View style={{ width: "50%", marginRight: 5 }}>
-          <TextInput
-            style={
-              userInput.invalidFirstName
-                ? styles.invalidNameContainer
-                : styles.validNameContainer
-            }
-            value={userInput.firstName}
-            onChangeText={onFirstNameInput}
-            onEndEditing={firstNameHandler}
-            selectionColor="#0d67b5"
-            placeholder="First Name"
-            textAlign="center"
-          ></TextInput>
-          {userInput.invalidFirstName ? (
-            <Text style={styles.errorText}>
-              *Name must contain alphabets only
-            </Text>
-          ) : null}
-        </View>
-
-        <View style={{ width: "50%", marginLeft: 5 }}>
-          <TextInput
-            style={
-              userInput.invalidLastName
-                ? styles.invalidNameContainer
-                : styles.validNameContainer
-            }
-            value={userInput.lastName}
-            onChangeText={onLastNameInput}
-            onEndEditing={lastNameHandler}
-            selectionColor="#0d67b5"
-            placeholder="Last Name"
-            textAlign="center"
-          ></TextInput>
-          {userInput.invalidLastName ? (
-            <Text style={styles.errorText}>
-              *Name must contain alphabets only
-            </Text>
-          ) : null}
-        </View>
-      </View>
-      <TextInput
-        style={
-          userInput.invalidEmail
-            ? styles.invalidInputContainer
-            : styles.validInputContainer
-        }
-        value={userInput.email}
-        onChangeText={onEmailInput}
-        onEndEditing={emailHandler}
-        selectionColor="#0d67b5"
-        placeholder="Email"
-        textAlign="center"
-      ></TextInput>
-      {userInput.invalidEmail ? (
-        <Text style={styles.errorText}>*Invalid Email</Text>
-      ) : null}
-
-      <TextInput
-        style={
-          userInput.invalidPassword
-            ? styles.invalidInputContainer
-            : styles.validInputContainer
-        }
-        value={userInput.password}
-        onChangeText={onPasswordInput}
-        onEndEditing={passwordHandler}
-        selectionColor="#0d67b5"
-        placeholder="Password"
-        secureTextEntry={true}
-        textAlign="center"
-      ></TextInput>
-      {userInput.invalidPassword ? (
-        <Text style={styles.errorText}>
-          *Password must be atleast 6 characters long
-        </Text>
-      ) : null}
-      <TextInput
-        style={
-          userInput.invalidConfirmPassword
-            ? styles.invalidInputContainer
-            : styles.validInputContainer
-        }
-        value={userInput.confirmPassword}
-        onChangeText={onConfirmPasswordInput}
-        selectionColor="#0d67b5"
-        placeholder="Confirm Password"
-        secureTextEntry={true}
-        textAlign="center"
-      ></TextInput>
-      {userInput.invalidConfirmPassword ? (
-        <Text style={styles.errorText}>*Passwords don't match</Text>
-      ) : null}
-      <View style={styles.buttonContainer}>
-        <FlatButton title="Sign Up" onPressed={signUpHandler}></FlatButton>
-      </View>
-      <View>
-        <TextButton
-          title="Already have an account?"
-          onPressed={() => {
-            props.navigation.navigate("Login");
-          }}
-        ></TextButton>
-      </View>
-    </View>
+    // Main Container
+    <SignUpForm
+      navigation={props.navigation}
+      enteredData={userInput}
+      firstNameValue={onFirstNameInput}
+      lastNameValue={onLastNameInput}
+      emailValue={onEmailInput}
+      passwordValue={onPasswordInput}
+      confirmPasswordValue={onConfirmPasswordInput}
+      firstNameValidity={firstNameHandler}
+      lastNameValidity={lastNameHandler}
+      emailValidity={emailHandler}
+      passwordValidity={passwordHandler}
+      signUp={signUpHandler}
+    ></SignUpForm>
   );
 }
-
-const styles = StyleSheet.create({
-  viewContainer: { flex: 3, alignItems: "center", justifyContent: "center" },
-
-  validInputContainer: {
-    borderColor: "#0d67b5",
-    borderWidth: 1,
-    borderRadius: 10,
-    width: "80%",
-    height: 50,
-    marginTop: 10,
-    padding: 10,
-    fontSize: 16,
-    color: "#0d67b5",
-    fontStyle: "italic",
-    backgroundColor: "#eef0e9",
-  },
-
-  invalidInputContainer: {
-    borderColor: "red",
-    borderWidth: 2,
-    borderRadius: 10,
-    width: "80%",
-    height: 50,
-    marginTop: 10,
-    padding: 10,
-    fontSize: 16,
-    color: "red",
-    fontStyle: "italic",
-    backgroundColor: "#eef0e9",
-  },
-
-  nameInputContainer: {
-    flexDirection: "row",
-    width: "80%",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-  },
-
-  validNameContainer: {
-    borderColor: "#0d67b5",
-    borderWidth: 1,
-    borderRadius: 10,
-    width: "100%",
-    height: 50,
-    marginTop: 10,
-    padding: 10,
-    fontSize: 16,
-    color: "#0d67b5",
-    fontStyle: "italic",
-    backgroundColor: "#eef0e9",
-  },
-
-  invalidNameContainer: {
-    borderColor: "red",
-    borderWidth: 2,
-    borderRadius: 10,
-    width: "100%",
-    height: 50,
-    marginTop: 10,
-    padding: 10,
-    fontSize: 16,
-    color: "red",
-    fontStyle: "italic",
-    backgroundColor: "#eef0e9",
-  },
-
-  errorText: {
-    fontSize: 8,
-    color: "red",
-    fontStyle: "italic",
-    marginLeft: 10,
-  },
-
-  buttonContainer: {
-    alignItems: "center",
-    margin: 20,
-  },
-});

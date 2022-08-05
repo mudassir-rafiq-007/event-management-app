@@ -3,6 +3,8 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import FlatButton from "../../Buttons/FlatButton";
 import { auth } from "../../Firebase/Firebase";
 
+
+// Navigation Prop type
 interface propstoHome {
   navigation: {
     navigate: (value: string) => void;
@@ -10,7 +12,9 @@ interface propstoHome {
 }
 
 export default function HomeScreen(props: propstoHome) {
-  async function logOut() {
+ 
+ 
+    async function logOut() {
     await signOut(auth)
       .then(() => {
         props.navigation.navigate("Login");
