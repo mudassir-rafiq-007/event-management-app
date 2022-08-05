@@ -12,7 +12,7 @@ function SignUp(props: propsToSignUp) {
     <View style={{ flex: 1 }}>
       <View style={styles.logoView}>
         <Image style={styles.imageStyle}
-          source={require("../../assets/event-tracker-transparent.png")}
+          source={require("../../../assets/event-tracker-logos.jpeg")}
         ></Image>
       </View>
       <SignUpInput navigation={props.navigation} ></SignUpInput>
@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
   imageStyle: {
     height: '100%',
     width: '100%',
+    resizeMode: "contain"
   }
   
 });
