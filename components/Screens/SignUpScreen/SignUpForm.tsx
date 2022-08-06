@@ -4,7 +4,7 @@ import TextButton from "../../Buttons/TextButton";
 
 interface propsToSignUp{
     navigation: {
-        navigate: (value: string) => void;
+        navigate: (value: string, {}: object) => void;
       };
 
     enteredData: {
@@ -92,6 +92,7 @@ export default function SignUpForm (props: propsToSignUp){
           value={props.enteredData.email}
           onChangeText={props.emailValue}
           onEndEditing={props.emailValidity}
+          autoCapitalize= "none"
           selectionColor="#0d67b5"
           placeholder="Email"
           textAlign="center"
@@ -110,6 +111,7 @@ export default function SignUpForm (props: propsToSignUp){
           value={props.enteredData.password}
           onChangeText={props.passwordValue}
           onEndEditing={props.passwordValidity}
+          autoCapitalize= "none"
           selectionColor="#0d67b5"
           placeholder="Password"
           secureTextEntry={true}
@@ -129,6 +131,7 @@ export default function SignUpForm (props: propsToSignUp){
           }
           value={props.enteredData.confirmPassword}
           onChangeText={props.confirmPasswordValue}
+          autoCapitalize= "none"
           selectionColor="#0d67b5"
           placeholder="Confirm Password"
           secureTextEntry={true}
@@ -145,7 +148,7 @@ export default function SignUpForm (props: propsToSignUp){
           <TextButton
             title="Already have an account?"
             onPressed={() => {
-              props.navigation.navigate("Login");
+              props.navigation.navigate("Login", {});
             }}
           ></TextButton>
         </View>
