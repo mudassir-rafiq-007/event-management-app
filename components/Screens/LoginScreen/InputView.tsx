@@ -1,21 +1,22 @@
 import { auth } from "../../Firebase/Firebase";
 import { signInWithEmailAndPassword } from "@firebase/auth";
-import { View, TextInput, Text, StyleSheet, Alert } from "react-native";
+
+import { View, TextInput, Text, StyleSheet, Alert, StatusBar } from "react-native";
 import FlatButton from "../../Buttons/FlatButton";
 import TextButton from "../../Buttons/TextButton";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import LogoView from "./LogoView";
+import LoadingIndicator from "../../LoadingIndicator/LoadingIndicator";
 
 // Navigation Prop type
 interface propstoInput {
-  navigation: {
     navigation: {
       navigate: (value: string) => void;
     };
-  };
 }
 
 export default function InputView(props: propstoInput) {
+  const [isLogging, setIsLogging] = useState(false)
   const [userData, setUserData] = useState({
     email: "",
     password: "",
@@ -32,11 +33,17 @@ export default function InputView(props: propstoInput) {
   }
 
   // Main Login Function
-  function loginUser() {
+async function loginUser() {
     if (userData.email && userData.password) {
-      signInWithEmailAndPassword(auth, userData.email, userData.password)
-        .then(() => {
-          props.navigation.navigation.navigate("Home");
+      setIsLogging(true)
+      await signInWithEmailAndPassword(auth, userData.email, userData.password)
+        .then((userCredentials) => {
+          userCredentials.user.emailVerified
+            ? props.navigation.navigate("Home")
+            : Alert.alert(
+                "Email not Verified",
+                "Verify your account by clicking a link sent to your email (check spam folder)"
+              );
         })
         .catch((error) =>
           Alert.alert(
@@ -44,29 +51,44 @@ export default function InputView(props: propstoInput) {
             "Entered credentials don't match any record"
           )
         );
+        setIsLogging(false)
         setUserData({
-          email: '',
-          password:'',
-        })
+          ...userData,
+          email: "",
+          password: "",
+        });      
+  
     } else {
       Alert.alert("Empty Fields", "Fill out every field");
     }
   }
 
+
+  if (isLogging){
+    return <LoadingIndicator></LoadingIndicator>
+  }
+
   return (
     // Input Fields Container
+    <View style={{ flex: 1 }}>
+      <StatusBar barStyle={"light-content"} backgroundColor={"#0d67b5"} />
+      <LogoView></LogoView>
     <View style={styles.viewContainer}>
       <TextInput
         style={styles.inputContainer}
+        value={userData.email}
         onChangeText={emailInput}
+        autoCapitalize= "none"
         selectionColor="#0d67b5"
-        placeholder="Enter Username"
+        placeholder="Enter Email"
         textAlign="center"
       ></TextInput>
 
       <TextInput
         style={styles.inputContainer}
+        value={userData.password}
         onChangeText={passwordInput}
+        autoCapitalize= "none"
         selectionColor="#0d67b5"
         placeholder="Enter Password"
         secureTextEntry
@@ -78,9 +100,10 @@ export default function InputView(props: propstoInput) {
       <TextButton
         title="Create a new account?"
         onPressed={() => {
-          props.navigation.navigation.navigate("SignUp");
+          props.navigation.navigate("SignUp");
         }}
       ></TextButton>
+    </View>
     </View>
   );
 }

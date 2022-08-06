@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Alert } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from "../../Firebase/Firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../Firebase/Firebase";
 import SignUpForm from "./SignUpForm";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import LoadingIndicator from "../../LoadingIndicator/LoadingIndicator";
 
 // Type of Navigation Prop received
 interface propsInterface {
@@ -12,9 +15,10 @@ interface propsInterface {
     navigate: (value: string) => void;
   };
 }
-
 // Main SignUp Function
 export default function SignUpInput(props: propsInterface) {
+  const[isSigningUp, setIsSigningUp] = useState(false)
+
   const [userInput, setUserInput] = useState({
     firstName: "",
     lastName: "",
@@ -124,13 +128,14 @@ export default function SignUpInput(props: propsInterface) {
 
   // Main function for sign up
   // Function contains nested ifs
-  function signUpHandler() {
+  async function signUpHandler() {
     // This condition checks if user has entered the data in every given field
     if (
       userInput.firstName &&
       userInput.lastName &&
       userInput.email &&
-      userInput.password
+      userInput.password &&
+      userInput.confirmPassword
     ) {
       // This condition checks the validity of entered data
       if (
@@ -143,20 +148,23 @@ export default function SignUpInput(props: propsInterface) {
         // If any field contains invalid input, this displays error
         Alert.alert("Invalid Input", "Data Fields contain invalid Input");
       } else {
-        createUserWithEmailAndPassword(
+        setIsSigningUp(true)
+       await createUserWithEmailAndPassword(
           auth,
           userInput.email,
           userInput.password
-        ).then(() => {
+        ).then((userCredentials) => {
             addDoc(collection(db, "users"),{
               userFirstName: userInput.firstName,
               userLastName: userInput.lastName,
               userEmail: userInput.email,
               userPassword: userInput.password
             })
-            props.navigation.navigate('Home')
+            sendEmailVerification(userCredentials.user)
+
+            props.navigation.navigate('Verify')
           }).catch((error) => Alert.alert(error.message));
-          
+          setIsSigningUp(false)
         // Sets the input fields back to empty
         setUserInput({
           firstName: "",
@@ -173,6 +181,11 @@ export default function SignUpInput(props: propsInterface) {
       }
     } else Alert.alert("Error", "Some fields missing data");
   }
+
+if (isSigningUp){
+  return <LoadingIndicator></LoadingIndicator>
+}
+
   return (
     // Main Container
     <SignUpForm
